@@ -75,7 +75,7 @@ const TaskState = (props) => {
         const newtaskresponse = await response.json()
         if (newtaskresponse.success) {
             await fetchtasks();
-            triggeralert({ type: 'success', msg: `successfully updated/commet` })
+            triggeralert({ type: 'success', msg: `successfully updated/commented` })
         }
         else
             triggeralert({ type: 'danger', msg: newtaskresponse.msg ? newtaskresponse.msg : `unable to ${update}` })
