@@ -1,0 +1,27 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+select,i,option{
+  cursor: pointer;
+}
+.h1{
+  font-size: 25px;
+}
+.h2{
+  font-size: 20px;
+}
+.h3{
+  font-size: 15px;
+}
+td {
+  padding: 5px 0;
+}
+tr{
+  margin: auto;
+}
+/* table {
+  margin: 5px;
+} */
