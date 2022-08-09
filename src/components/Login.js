@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import UserContext from '../context/users/UserContext';
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 export default function Login() {
   const history = useHistory();
@@ -29,6 +29,9 @@ export default function Login() {
         </div>
         <button type='submit' className="btn btn-primary" disabled={usercredentials.Password === '' || usercredentials.Email === '' || !usercredentials.Email.includes('@')} >Login</button>
       </form>
+      <div>Don't have Account, Sign Up
+        <Link className="mx-1 px-1 m-1" to="/signup">Here!</Link>
+      </div>
     </div>
   )
 }
