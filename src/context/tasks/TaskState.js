@@ -3,7 +3,7 @@ import TaskContext from "./TaskContext";
 const TaskState = (props) => {
 
     const [usertasks, settasks] = useState([])
-    const URL = 'http://localhost:4040'; //backend url
+    const URL = 'http://52.41.128.88:4040'; //backend url
     //read task
     const fetchtasks = async () => {
         let response = await fetch(`${URL}/api/task/viewtask`, { method: 'get', headers: { 'authToken': localStorage.getItem('authToken') } });
@@ -35,6 +35,7 @@ const TaskState = (props) => {
         }
         else
             triggeralert({ type: 'danger', msg: 'unable to add task' })
+        return newtaskresponse.success;
     }
 
     // delete task
@@ -53,6 +54,8 @@ const TaskState = (props) => {
         }
         else
             triggeralert({ type: 'danger', msg: newtaskresponse.msg ? newtaskresponse.msg : 'unable to delete the task' })
+        return newtaskresponse.success;
+
     }
 
     // //temp task use in edit task
@@ -76,6 +79,8 @@ const TaskState = (props) => {
         }
         else
             triggeralert({ type: 'danger', msg: newtaskresponse.msg ? newtaskresponse.msg : `unable to ${update}` })
+        return newtaskresponse.success;
+
     }
 
     //alert module

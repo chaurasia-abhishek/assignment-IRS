@@ -4,7 +4,7 @@ const UserState = (props) => {
     //islogin
     const [loginstatus, setloginstatus] = useState(false)
     
-    const URL ='http://localhost:4040'; //backend url
+    const URL ='http://52.41.128.88:4040'; //backend url
 
     //loginned user detail
     const [USER, SETUSER] = useState({ Name: 'absf' })

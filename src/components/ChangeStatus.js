@@ -1,20 +1,17 @@
 import React, { useContext, useRef, useState } from 'react'
-import { useHistory } from 'react-router-dom';
 import TaskContext from '../context/tasks/TaskContext';
 export default function CreateTask(props) {
-    const [global, setglobal] = useState(props.global)
-    const [task_description, settask_description] = useState(props.task_description)
-    const history = useHistory();
+    const [global, setglobal] = useState(props.tempdes.global)
+    const [task_description, settask_description] = useState(props.tempdes.task_description)
     const { updatetask, fetchtasks } = useContext(TaskContext)
     const ref = useRef(null);
 
-    const changetaskdescription = () => {
-        updatetask(props.id,{ task_description, global })
-        ref.current.click();
-        fetchtasks();
-        setglobal(false)
-        settask_description('')
-        history.push('/tasks')
+    const changetaskdescription = async () => {
+        if (await updatetask(props.id, { task_description, global })) {
+            props.settempdes({ task_description, global })
+            ref.current.click();
+            fetchtasks();
+        }
     }
     return (
         <div className="modal fade z-index-3" id="newexampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
