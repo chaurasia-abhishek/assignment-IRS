@@ -1,7 +1,5 @@
 const express = require('express');
 const TaskSchema = require('../models/task');
-const CommetSchema = require('../models/comment');
-const UserSchema = require('../models/user');
 const router = express.Router();
 const { body, validationResult, param } = require('express-validator');
 const fetchUserId = require('../middleware/fetchuser')
@@ -29,7 +27,8 @@ router.post('/createtask', [
             task_description: req.body.task_description,
             UserName: req.user.Name,
             UserId: req.user._id,
-            comments: comment
+            comments: comment,
+            global: req.body.global
         })
 
         res.status(200).json({ success: true, data: newTask })
@@ -48,11 +47,11 @@ router.get('/viewtask', fetchUserId, async (req, res) => {
 
         //if user is a team member can only access own notes
         if (req.user.Role === 'Team Member')
-            tasks = (await TaskSchema.find({ UserId: req.user._id }))
+            tasks = await TaskSchema.find({ $or :[{ UserId: req.user._id }, { global: true }] }).sort({ createdAt: '-1' })
 
         //if user is an admin can access all notes
         else
-            tasks = (await TaskSchema.find())
+            tasks = await TaskSchema.find().sort({ createdAt: '-1' })
         res.status(200).json({ success: true, data: tasks });
 
     } catch (error) {
@@ -82,7 +81,7 @@ router.put('/update/:id',
             return res.status(400).json({ success: false, msg: 'invalid task Id try with valid task' })
 
         //only admin and task creator can comment & task creator change 
-        if (req.user.Role !== 'Admin' && String(req.user._id) !== String(task.UserId))
+        if (!task.global && req.user.Role !== 'Admin' && String(req.user._id) !== String(task.UserId))
             return res.status(400).json({ success: false, msg: 'you dont have permission to change and comment' })
 
         try {
@@ -95,10 +94,13 @@ router.put('/update/:id',
                     updatedAt: new Date,
                     updatedBy: req.user.Name
                 }
-                updatedTask = await TaskSchema.findByIdAndUpdate(task._id, { $push: { comments: comment } })
+                updatedTask = await TaskSchema.findByIdAndUpdate(task._id, { $push: { comments: { $each: [comment], $position: 0 } } })
             }
             else if (req.body.task_description && String(req.user._id) === String(task.UserId))
-                updatedTask = await TaskSchema.findByIdAndUpdate(task._id, { task_description: req.body.task_description })
+                updatedTask = await TaskSchema.findByIdAndUpdate(task._id, {
+                    task_description: req.body.task_description,
+                    global: req.body.global
+                })
             else
                 return res.status(400).json({ success: false, msg: "you don't have permission to change the task description" });
 
@@ -120,7 +122,7 @@ router.delete('/delete/:id', fetchUserId, async (req, res) => {
         return res.status(400).json({ success: false, msg: 'invalid task id, task not found' })
 
     //only admin and task creator can delete the task
-    if (req.user.Role !== 'Admin' && req.user._id !== task.UserId)
+    if (req.user.Role !== 'Admin' && String(req.user._id) !== String(task.UserId))
         return res.status(400).json({ success: false, msg: 'you dont have permission to delete the task' })
 
     try {

@@ -18,6 +18,10 @@ const TaskSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    global: {
+        type: Boolean,
+        default: false
+    },
     comments: {
         type: Array,
     }
