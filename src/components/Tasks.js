@@ -12,7 +12,6 @@ const Tasks = () => {
     if (loginstatus)
       fetchtasks()
     else if (localStorage.getItem('authToken')) {
-    //  if (localStorage.getItem('authToken')) {
       FETCHUSER();
       fetchtasks()
     }
@@ -21,11 +20,12 @@ const Tasks = () => {
     }
     // eslint-disable-next-line
   }, [])
-  // }, [usertasks])
   return (
     <div className="container mt-4">
       <h3 className='text-center mb-4'>{usertasks.length === 0 ? 'No Task' : 'Tasks'}</h3>
-      {usertasks.length !== 0 && <div className="row">{usertasks.map((T, i) => <Task key={i} task={T} />)}</div>}
+      <div className="row">
+        {usertasks.length !== 0 && usertasks.map((T, i) => <Task key={i} task={T} />) }
+      </div>
     </div>
   )
 }

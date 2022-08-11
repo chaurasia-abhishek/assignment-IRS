@@ -1,15 +1,15 @@
 import React, { useContext, useRef, useState } from 'react'
 import TaskContext from '../context/tasks/TaskContext'
-import UserContext from '../context/users/UserContext'
 
 export default function CreateTask() {
     const [global, setglobal ] = useState(false)
     const { createTask } = useContext(TaskContext)
     const [task_description, settask_description] = useState('')
     const ref = useRef(null);
+    const [userdocs, setuserdocs] = useState()
 
     const submitnote = () => {
-        createTask({task_description,global})
+        createTask({task_description,global,userdocs})
         ref.current.click();
         setglobal(false)
         settask_description('')
@@ -22,6 +22,10 @@ export default function CreateTask() {
                     <div className="mb-3">
                         <label htmlFor="task_description" className="form-label">Task</label>
                         <textarea className={`form-control ${task_description.length < 3 ? 'border-danger' : ''}`} id="task_description" value={task_description} name="task_description" onChange={(e)=>{settask_description(e.target.value)}} placeholder="Enter the task (minimum 3 characters)"></textarea>
+                    </div>
+                    <div className=" mb-3">
+                        <label className="form-label" htmlFor="inputGroupFile02">Update Profile</label>
+                        <input type="file" encType="multipart/form-data" name='userdocs' onChange={(e) => { setuserdocs(e.target.files[0]) }} className="form-control" id="inputGroupFile02" />
                     </div>
                     <div className="form-check">
                         <input className="form-check-input" type="checkbox" name='global' value={global} checked={global} onChange={() => { global?setglobal(false):setglobal(true)}} id="flexCheckDefault"/>

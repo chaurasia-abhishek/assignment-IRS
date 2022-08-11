@@ -3,6 +3,7 @@ import TaskContext from "./TaskContext";
 const TaskState = (props) => {
 
     const [usertasks, settasks] = useState([])
+    // const URL = 'http://localhost:4040'; //backend url
     const URL = 'http://52.41.128.88:4040'; //backend url
     //read task
     const fetchtasks = async () => {
@@ -18,15 +19,18 @@ const TaskState = (props) => {
 
     //add task  
     const createTask = async (newtask) => {
-        const jsontask = JSON.stringify(newtask)
-
+        // const jsontask = JSON.stringify(newtask)
+        const formData= new FormData();
+        formData.append('task_description',newtask.task_description)
+        formData.append('global',newtask.global)
+        formData.append('userdocs',newtask.userdocs)
         const response = await fetch(`${URL}/api/task/createtask`, {
             method: 'post',
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json',
                 'authToken': localStorage.getItem('authToken')
             },
-            body: jsontask
+            body: formData
         });
         const newtaskresponse = await response.json()
         if (newtaskresponse.success) {
@@ -62,15 +66,20 @@ const TaskState = (props) => {
     const [temptask, settemptask] = useState('null')
 
     const updatetask = async (id, update) => {
-        const jsonupdate = JSON.stringify(update)
-
+        // const jsonupdate = JSON.stringify(update)
+        const formData = new FormData();
+        formData.append('task_description',update.task_description)
+        formData.append('global',update.global)
+        formData.append('userdocs',update.userdocs)
+        update.newcomment&&formData.append('comment',update.newcomment.comment)
+        console.log(update)
         const response = await fetch(`${URL}/api/task/update/${id}`, {
             method: 'put',
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json',
                 'authToken': localStorage.getItem('authToken')
             },
-            body: jsonupdate
+            body: formData
         });
         const newtaskresponse = await response.json()
         if (newtaskresponse.success) {
@@ -108,9 +117,17 @@ const TaskState = (props) => {
         else
             return '~'+(CT.getSeconds() - PT.getSeconds()) + ' seconds ago'
     }
-
+    const checkdoc = (a) => {
+        if (a)
+          if (a.endsWith('.png') || a.endsWith('.jpg'))
+            return a;
+          else
+            return 'nopreview.png'
+        else
+          return 'nodoc.png'
+      }
     return (
-        <TaskContext.Provider value={{ usertasks, fetchtasks, createTask, deletetask, alert, triggeralert, setalert, loginstatus, setloginstatus, Capital, temptask, settemptask, updatetask, lastUpdated }}>
+        <TaskContext.Provider value={{ checkdoc,URL,usertasks, fetchtasks, createTask, deletetask, alert, triggeralert, setalert, loginstatus, setloginstatus, Capital, temptask, settemptask, updatetask, lastUpdated }}>
             {props.children}
         </TaskContext.Provider>
     )

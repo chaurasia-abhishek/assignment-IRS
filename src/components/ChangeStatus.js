@@ -1,16 +1,19 @@
 import React, { useContext, useRef, useState } from 'react'
+import { useHistory } from 'react-router-dom';
 import TaskContext from '../context/tasks/TaskContext';
 export default function CreateTask(props) {
     const [global, setglobal] = useState(props.tempdes.global)
     const [task_description, settask_description] = useState(props.tempdes.task_description)
     const { updatetask, fetchtasks } = useContext(TaskContext)
     const ref = useRef(null);
-
+    const [userdocs, setuserdocs] = useState()
+    const history=useHistory();
     const changetaskdescription = async () => {
-        if (await updatetask(props.id, { task_description, global })) {
+        if (await updatetask(props.id, { task_description, global,userdocs })) {
             props.settempdes({ task_description, global })
             ref.current.click();
             fetchtasks();
+            history.push('/tasks')
         }
     }
     return (
@@ -23,6 +26,10 @@ export default function CreateTask(props) {
                         <div className="form-floating">
                             <textarea className="form-control p-2" placeholder="Leave a comment here" value={task_description} onChange={(e) => { settask_description(e.target.value) }} id="Task_Description"></textarea>
                         </div>
+                    </div>
+                    <div className=" mb-3">
+                        <label className="form-label" htmlFor="inputGroupFile02">Update Profile</label>
+                        <input type="file" encType="multipart/form-data" name='userdocs' onChange={(e) => { setuserdocs(e.target.files[0]) }} className="form-control" id="inputGroupFile02" />
                     </div>
                     <div className="form-check">
                         <input className="form-check-input" type="checkbox" onChange={() => { global ? setglobal(false) : setglobal(true); }} value={global} checked={global} name='global' id="flexCheckDefault" />

@@ -7,8 +7,8 @@ import Comment from './Comment'
 
 const ViewTask = () => {
     const history = useHistory();
-    const { temptask, Capital, lastUpdated, updatetask, deletetask } = useContext(TaskContext)
-    const { USER } = useContext(UserContext)
+    const { temptask, Capital, lastUpdated, updatetask, deletetask, checkdoc } = useContext(TaskContext)
+    const { USER, URL } = useContext(UserContext)
 
     const [tempdes, settempdes] = useState({ task_description: temptask.task_description, global: temptask.global })
     const [tempcomment, settempcomment] = useState(temptask.comments)
@@ -20,8 +20,8 @@ const ViewTask = () => {
         history.push("/tasks")
     }
     async function sendcomment() {
-        if (await updatetask(temptask._id, newcomment)) {
-            settempcomment([{comment: newcomment.comment, updatedBy: USER.Name, updatedAt: new Date()}].concat(tempcomment))
+        if (await updatetask(temptask._id, { newcomment })) {
+            settempcomment([{ comment: newcomment.comment, updatedBy: USER.Name, updatedAt: new Date() }].concat(tempcomment))
             setnewcomment({ comment: '' })
         }
     }
@@ -32,10 +32,15 @@ const ViewTask = () => {
         <div className="my-2 row p-1 w-100">
             < ChangeStatus id={temptask._id} tempdes={tempdes} settempdes={settempdes} />
             <div className="col-md-7 mx-auto mt-5">
-                <div className="card mx-auto">
+                <div className="card mx-auto text-center">
                     <div className="card-body">
                         <h5 className="card-title">Created by : {Capital(temptask.UserName)}</h5>
+                        <div className="mx-auto mt-2" style={{ width: '50%' }}>
+                            <img src={`${URL}/static/files/${checkdoc(temptask.docs)}`} className='align-self-center' style={{ width: '75%' }} alt="profile" />
+                        </div>
+
                         <p className="card-text">{tempdes.task_description}.</p>
+                        {temptask.docs && <a href={`${URL}/static/files/${temptask.docs}`} target="blank" className='p-1'>Document-link</a>}
                     </div>
                     <div div className='d-flex justify-content-center'>
                         {USER._id === temptask.UserId && <i className="fa-solid fa-pen-to-square p-1 m-1" data-bs-toggle="modal" data-bs-target="#newexampleModal" type='button' ></i>}

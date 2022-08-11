@@ -4,6 +4,7 @@ import CreateTask from './CreateTask'
 import UserContext from '../context/users/UserContext'
 import { useHistory } from 'react-router-dom'
 import TaskContext from '../context/tasks/TaskContext'
+import ChangeProfile from './ChangeProfile'
 
 const Home = () => {
   const history = useHistory()
@@ -21,11 +22,13 @@ const Home = () => {
 
     // eslint-disable-next-line
   }, [usertasks])
+
   return (
     <div className='container my-2 p-2 d-flex flex-column'>
       <h2 className='m-auto p-1 d-inline'>User Profile</h2>
-      <UserProfile />
-      <CreateTask />
+      {loginstatus&&<UserProfile />}
+      {loginstatus&&<CreateTask />}
+      {loginstatus&&<ChangeProfile />}
     </div>
   )
 }

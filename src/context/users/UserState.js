@@ -3,18 +3,26 @@ import UserContext from "./UserContext";
 const UserState = (props) => {
     //islogin
     const [loginstatus, setloginstatus] = useState(false)
-    
-    const URL ='http://52.41.128.88:4040'; //backend url
+    // const URL = 'http://localhost:4040'; //backend url
+
+    const URL = 'http://52.41.128.88:4040'; //backend url
 
     //loginned user detail
-    const [USER, SETUSER] = useState({ Name: 'absf' })
+    const [USER, SETUSER] = useState({
+        "_id": "62f206705d43c9f4",
+        "Name": "guest",
+        "Email": "guest@gmail.com",
+        "Role": "Team Member",
+        "Date": "2022-08-09T07:02:08.549Z",
+        "__v": 0
+    })
     const [allusers, setalluseres] = useState([])
 
     //users detalils
     const fetchusers = async () => {
         let response = await fetch(`${URL}/api/user/viewuser`, { method: 'get', headers: { 'authToken': localStorage.getItem('authToken') } });
         let data = await response.json();
-            setalluseres(data.teamUsers)
+        setalluseres(data.teamUsers)
     }
     //fetching current user details
     const FETCHUSER = async () => {
@@ -47,7 +55,7 @@ const UserState = (props) => {
         return logintoken.success
     }
 
-    //mew user signup auth
+    //new user signup auth
     const SIGNUPAUTH = async (newusercredentials) => {
         const jsonnewusercredentialslogin = JSON.stringify(newusercredentials)
         const response = await fetch(`${URL}/api/user/signup`, {
@@ -66,6 +74,31 @@ const UserState = (props) => {
     }
 
 
+    //updateprofile
+    const USERPROFILEUPDATE = async (updateddata) => {
+        console.log(updateddata)
+        const formData = new FormData();
+        formData.append('Name', updateddata.tempprofile.Name)
+        formData.append('Email', updateddata.tempprofile.Email)
+        formData.append('userdocs', updateddata.userdocs)
+        const response = await fetch(`${URL}/api/user/updateprofile`, {
+            method: 'put',
+            headers: {
+                'authToken': localStorage.getItem('authToken')
+            },
+            body: formData
+        });
+        const update = await response.json()
+        if (update.success) {
+            triggeralert({ type: 'success', msg: 'profile updated successfully' })
+            FETCHUSER()
+        }
+        else
+            triggeralert({ type: 'danger', msg: update.msg ? update.msg : update.error })
+        return update.success
+    }
+
+
     //alert module
     const [Alert, setalert] = useState()
     const triggeralert = (alert) => {
@@ -76,7 +109,7 @@ const UserState = (props) => {
     const Capital = word => word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
 
 
-    return <UserContext.Provider value={{ allusers, fetchusers, SETUSER, USER, FETCHUSER, USERAUTH, SIGNUPAUTH, loginstatus, setloginstatus, Alert, triggeralert, Capital }}>
+    return <UserContext.Provider value={{ URL, allusers, fetchusers, SETUSER, USER, FETCHUSER, USERAUTH, SIGNUPAUTH, USERPROFILEUPDATE, loginstatus, setloginstatus, Alert, triggeralert, Capital }}>
         {props.children}
     </UserContext.Provider>
 
