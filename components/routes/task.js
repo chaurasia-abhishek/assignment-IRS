@@ -3,11 +3,12 @@ const TaskSchema = require('../models/task');
 const router = express.Router();
 const { body, validationResult, param } = require('express-validator');
 const fetchUserId = require('../middleware/fetchuser')
+const savedocument = require('../middleware/savedocument')
 
 
 router.post('/createtask', [
     body('task_description', 'task description cant be empty').isLength({ min: 3 })
-], fetchUserId, async (req, res) => {
+], fetchUserId, savedocument,async (req, res) => {
     const error = validationResult(req);
     //validating the required fields
     if (!error.isEmpty())
@@ -28,6 +29,7 @@ router.post('/createtask', [
             UserName: req.user.Name,
             UserId: req.user._id,
             comments: comment,
+            docs: req.filename,
             global: req.body.global
         })
 
@@ -63,7 +65,7 @@ router.get('/viewtask', fetchUserId, async (req, res) => {
 //change the status of the task & comment admin & task creator can do
 router.put('/update/:id',
     [param('id', ` invalid id`).isMongoId()]
-    , fetchUserId, async (req, res) => {
+    , fetchUserId,savedocument, async (req, res) => {
         const error = validationResult(req);
         //validating the required fields
         if (!error.isEmpty())
@@ -99,7 +101,8 @@ router.put('/update/:id',
             else if (req.body.task_description && String(req.user._id) === String(task.UserId))
                 updatedTask = await TaskSchema.findByIdAndUpdate(task._id, {
                     task_description: req.body.task_description,
-                    global: req.body.global
+                    global: req.body.global,
+                    docs:req.filename
                 })
             else
                 return res.status(400).json({ success: false, msg: "you don't have permission to change the task description" });

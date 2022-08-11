@@ -9,6 +9,9 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    UserProfile: {
+        type: String,
+    },
     Password: {
         type: String,
         required: true

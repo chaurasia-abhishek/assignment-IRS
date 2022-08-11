@@ -5,6 +5,8 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fetchUserId = require('../middleware/fetchuser')
+const savedocument = require('../middleware/savedocument')
+
 const jwt_string = 'heisagoodb$oy';//digital signature key for session authentication
 
 const status = false;
@@ -39,6 +41,38 @@ router.post('/signup', [
         }
         const authToken = jwt.sign(data, jwt_string)
         res.json({ authToken, success: true })
+    } catch (error) {
+        console.error(error.message)
+        return res.status(500).json({ success: status, msg: 'Internal server error ', error: error.message });
+    }
+}
+)
+
+
+//change user profile
+router.put('/updateprofile', fetchUserId, [
+    body('Name', 'enter a valid name').isLength({ min: 3 }),
+    body('Email', 'enter a valid email').isEmail()
+], savedocument, async (req, res) => {
+    // validating all the required fields
+    const error = validationResult(req);
+    if (!error.isEmpty())
+        return res.status(400).json({ success: status, error: error.array(), msg: 'please fill all the required field correctly' });
+    try {
+        // is email already exist
+        if (req.user.Email !== req.body.Email) {
+            const updateduser = await UserSchema.findOne({ Email: req.body.Email })
+            if (updateduser)
+                return res.status(400).json({ success: status, msg: 'user already exist please try with another email' });
+        }
+
+        //creating user profile in database
+        const updateduser = await UserSchema.findByIdAndUpdate(req.user.id, {
+            Name: req.body.Name,
+            Email: req.body.Email,
+            UserProfile: req.filename
+        })
+        res.json({ updateduser, success: true })
     } catch (error) {
         console.error(error.message)
         return res.status(500).json({ success: status, msg: 'Internal server error ', error: error.message });
@@ -110,7 +144,6 @@ router.get('/viewuser', fetchUserId, async (req, res) => {
 
 //deleting the users only admin user can
 router.delete('/deleteuser/:id', fetchUserId, async (req, res) => {
-    const user = await UserSchema.findById(req.user.id);
     //if user is not an admin
     if (req.user.Role !== 'Admin')
         return res.status(400).json({ success: status, msg: 'you don`t have permission to delete the task' })
